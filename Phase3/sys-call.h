@@ -1,11 +1,11 @@
 #ifndef __SYS_CALL__
 #define __SYS_CALL__
 
-extern int GetPidCall(void);
-extern void ShowCharCall(int, int, int);
-extern void SleepCall(int);
-extern int MuxCreateCall(int);
-extern void MuxOpCall(int, int);
-extern void WriteCall(int, char *);
+int GetPidCall(void);
+void ShowCharCall(int, int, int);
+void SleepCall(int);
+int MuxCreateCall(int);
+void MuxOpCall(int, int);
+void WriteCall(int, char *);
 
 #endif

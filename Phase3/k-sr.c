@@ -115,7 +115,7 @@ int MuxCreateSR(int flag) {
 }
 
 // details described in 3.html
-int MuxOpSR(int id, int opcode) {
+void MuxOpSR(int id, int opcode) {
     switch (opcode) {
         case LOCK:
             // decrement the flag in the mutex by 1 if it is greater than 0, otherwise

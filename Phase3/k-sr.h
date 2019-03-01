@@ -7,6 +7,6 @@ int GetPidSR(void);
 void ShowCharSR(int, int, int);
 void SleepSR(int);
 int MuxCreateSR(int);
-int MuxOpSR(int, int);
+void MuxOpSR(int, int);
 
 #endif
