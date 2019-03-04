@@ -90,8 +90,11 @@ void WriteCall(int device, char *str) {
     pid = GetPidCall();
     row = pid;
     col = 0;
-    while(str) {
-        ShowCharCall(row, col++, *str);
-        str++;
+
+    if(device == STDOUT) {
+        while(str) {
+            ShowCharCall(row, col++, *str);
+            str++;
+        }
     }
 }

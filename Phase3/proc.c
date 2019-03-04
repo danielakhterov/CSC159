@@ -5,6 +5,10 @@
 // Phase3: Request/alloc vid_mux using the new service MuxCreateCall().
 void InitProc(void) {
     int i;
+
+    // Creating vid_mux
+    vid_mux = MuxCreateCall(1);
+
     while(1) {
         // show a dot at upper-left corener of PC
         ShowCharCall(0, 0, '.');
@@ -25,20 +29,16 @@ void UserProc(void) {
     int pid = GetPidCall();
     int i;
     int _pid = pid;
+
     while(1) {
         int length;
-
-        // The maximum length of a 4 byte int is 10 characters.
-        // The string that will contain the number we print
         char chars[11] = "0000000000";
 
-        // We need a copy of pid to get the string from
-        // because this mutates the variable.
         _pid = pid;
         length = 0;
 
-        // For every digit in the number we put it into the array
-        // This moves right to left which means the number actual
+        MuxOpCall(vid_mux, LOCK);
+
         // number would be backwards in the array
         while(_pid / 10 > 0) {
             chars[length] = (char)((_pid % 10) + '0');
@@ -63,5 +63,6 @@ void UserProc(void) {
         }
 
         SleepCall(50);
+        MuxOpCall(vid_mux, UNLOCK);
     }
 }

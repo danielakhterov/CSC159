@@ -22,7 +22,7 @@ void NewProcSR(func_p_t p) {
     // clear PCB
     Bzero((char *)&pcb[pid], sizeof(pcb_t));
     // clear stack
-    Bzero((char *)&pcb[pid], PROC_STACK_SIZE);
+    Bzero((char *)&proc_stack[pid], PROC_STACK_SIZE);
     // change process state
     pcb[pid].state = READY;
 
@@ -61,7 +61,7 @@ void TimerSR(void) {
 
     // if runs long enough
 
-    while(pcb[sleep_q.q[0]].wake_centi_sec <= sys_centi_sec && sleep_q.length > 0) {
+    while(pcb[sleep_q.q[0]].wake_centi_sec <= sys_centi_sec && sleep_q.tail > 0) {
         pid = PriorityDequeue(&sleep_q);
         pcb[pid].state = READY;
         EnQ(pid, &ready_q);
@@ -115,7 +115,7 @@ int MuxCreateSR(int flag) {
 }
 
 // details described in 3.html
-int MuxOpSR(int id, int opcode) {
+void MuxOpSR(int id, int opcode) {
     switch (opcode) {
         case LOCK:
             // decrement the flag in the mutex by 1 if it is greater than 0, otherwise

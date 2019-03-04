@@ -41,9 +41,7 @@ typedef struct {
     // generic queue type
     // for a simple queue
     int q[Q_SIZE];
-    int head;
     int tail;
-    int length;
 } q_t;
 
 // Phase3

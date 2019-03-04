@@ -10,8 +10,8 @@ void Bzero(char * p, int bytes) {
     }
 }
 
-int QisEmpty(q_t * p) { return p->length == 0; }
-int QisFull(q_t * p) { return p->length == Q_SIZE; }
+int QisEmpty(q_t * p) { return p->tail == 0; }
+int QisFull(q_t * p) { return p->tail == Q_SIZE; }
 
 // Dequeue, 1st # in queue; if queue is empty, return -1 (NONE)
 // move rest to front by a notch, set empty spaces -1
@@ -24,15 +24,15 @@ int DeQ(q_t * p) {
     }
 
     // return value
-    ret = p->q[p->head];
+    ret = p->q[0];
 
     // Shift the elements
-    for(i = 1; i < p->length; i++) {
+    for(i = 1; i < p->tail; i++) {
         p->q[i-1] = p->q[i];
     }
 
     p->tail--;
-    p->length--;
+    p->q[p->tail] = 0;
 
     return ret;
 }
@@ -46,7 +46,6 @@ void EnQ(int to_add, q_t * p) {
 
     p->q[p->tail] = to_add;
     p->tail++;
-    p->length++;
 
     return;
 }
@@ -73,9 +72,9 @@ void Heapify(q_t * p, int i) {
     r = right(i); 
     smallest = i; 
 
-    if (l < p->length && p->q[l] < p->q[i]) 
+    if (l < p->tail && p->q[l] < p->q[i]) 
         smallest = l; 
-    if (r < p->length && p->q[r] < p->q[smallest]) 
+    if (r < p->tail && p->q[r] < p->q[smallest]) 
         smallest = r; 
     if (smallest != i) { 
         swap(&p->q[i], &p->q[smallest]); 
@@ -90,8 +89,8 @@ void PriorityEnqueue(q_t * p, int pid) {
         return;
     }
 
-    p->length++;
-    i = p->length - 1;
+    p->tail++;
+    i = p->tail - 1;
     p->q[i] = pid;
 
     while(i != 0 && p->q[parent(i)] > p->q[i]) {
@@ -106,15 +105,15 @@ int PriorityDequeue(q_t * p) {
         return NONE;
     }
 
-    if (p->length == 1) { 
-        p->length--; 
+    if (p->tail == 1) { 
+        p->tail--; 
         return p->q[0]; 
     } 
   
     // Store the minimum value, and remove it from heap 
     root = p->q[0]; 
-    p->q[0] = p->q[p->length - 1]; 
-    p->length--; 
+    p->q[0] = p->q[p->tail - 1]; 
+    p->tail--; 
     Heapify(p, 0); 
   
     return root; 

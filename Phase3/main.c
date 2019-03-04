@@ -27,7 +27,7 @@ struct i386_gate * intr_table;
 int sys_centi_sec = 0;
 
 mux_t mux[MUX_SIZE]; 
-int vid_mux;         
+int vid_mux = 0;
 
 // Initialize Kernal Data
 void InitKernelData(void) {
@@ -78,6 +78,16 @@ void InitKernelControl(void) {
     // Interupt table for SleepCall
     fill_gate(&intr_table[SLEEP_CALL], 
             (int)SleepEntry, get_cs(), 
+            ACC_INTR_GATE, 
+            0);
+
+    fill_gate(&intr_table[MUX_CREATE_CALL], 
+            (int)MuxCreateEntry, get_cs(), 
+            ACC_INTR_GATE, 
+            0);
+
+    fill_gate(&intr_table[MUX_OP_CALL], 
+            (int)MuxOpEntry, get_cs(), 
             ACC_INTR_GATE, 
             0);
 
@@ -156,7 +166,7 @@ void Kernel(trapframe_t * trapframe_p) {
             SleepSR(trapframe_p->eax);
             break;
         case MUX_CREATE_CALL:
-            MuxCreateSR(trapframe_p->eax);
+            trapframe_p->eax = MuxCreateSR(trapframe_p->eax);
             break;
         case MUX_OP_CALL:
             MuxOpSR(trapframe_p->eax, trapframe_p->ebx);

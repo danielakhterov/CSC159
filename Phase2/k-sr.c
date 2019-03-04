@@ -22,7 +22,7 @@ void NewProcSR(func_p_t p) {
     // clear PCB
     Bzero((char *)&pcb[pid], sizeof(pcb_t));
     // clear stack
-    Bzero((char *)&pcb[pid], PROC_STACK_SIZE);
+    Bzero((char *)&proc_stack[pid], PROC_STACK_SIZE);
     // change process state
     pcb[pid].state = READY;
 
