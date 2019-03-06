@@ -12,8 +12,13 @@ void TimerEntry(void);
 int GetPidEntry(void);
 void ShowCharEntry(int, int, char);
 void SleepEntry(int);
+
 int MuxCreateEntry(int);
 void MuxOpEntry(int, int);
+
+void TERM0Entry(int);
+void TERM1Entry(int);
+
 void Loader(trapframe_t *);
 
 __END_DECLS

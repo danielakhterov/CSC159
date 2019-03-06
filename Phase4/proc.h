@@ -2,8 +2,10 @@
 #define __PROC__
 
 void Delay(void);
-void ShowChar(int row, int col, char ch);
+void ShowChar(int, int, char);
 void InitProc(void);
 void UserProc(void);
+
+void InitTerm(int);
 
 #endif

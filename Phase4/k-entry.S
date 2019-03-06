@@ -44,6 +44,14 @@ ENTRY(MuxOpEntry)
     pushl $MUX_OP_CALL
     jmp PreKernel
 
+ENTRY(TERM0Entry)
+    pushl $TERM0_INTR
+    jmp PreKernel
+
+ENTRY(TERM1Entry)
+    pushl $TERM1_INTR
+    jmp PreKernel
+
 // build rest of trapframe, switch stack, pass arg, call Kernel
 PreKernel: 
     // push all: eax ecx edx ebx esp ebp esi edi

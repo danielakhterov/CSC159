@@ -8,7 +8,7 @@
 // Programmable Interrupt Controller(PIC) I/O
 #define PIC_MASK 0x21
 // Mask for PIC
-#define MASK ~0x01
+// #define MASK ~0x01
 // PIC I/O
 #define PIC_CONTROL 0x20
 // Sent to PIC when timer service done
@@ -42,5 +42,28 @@
 #define LOCK 1
 #define UNLOCK 2
 #define STDOUT 1
+
+// p4, 2 terminals
+#define TERM_SIZE 2
+// 1st terminal intr ID
+#define TERM0_INTR 35
+// 2nd terminal intr ID
+#define TERM1_INTR 36
+// I/O base of 1st term 0010 1111 1000
+#define TERM0_IO_BASE 0x2f8
+// I/O base of 2nd term 0011 1110 1000
+#define TERM1_IO_BASE 0x3e8
+// to send to PIC when 1st term served
+#define TERM0_DONE_VAL 0x63
+// to send to PIC when 2st term served
+#define TERM1_DONE_VAL 0x64
+// terminal has a Transmit Ready event
+#define TXRDY 2
+// terminal has a Receive Ready event
+#define RXRDY 4
+// new mask 1111_1111_1111_1111_1111_1111_1110_0110
+#define MASK 0xffffffe6
+#define TRUE 1
+#define FALSE 1
 
 #endif

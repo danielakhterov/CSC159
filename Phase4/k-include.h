@@ -17,7 +17,7 @@
 #include <spede/machine/asmacros.h>
 
 // For terminals, IRQ3 constants
-// #include <spede/machine/rs232.h>
+#include <spede/machine/rs232.h>
 
 #endif
 

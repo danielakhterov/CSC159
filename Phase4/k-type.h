@@ -57,4 +57,18 @@ typedef struct {
     q_t suspend_q;
 } mux_t;
 
+typedef struct {
+    // when initialized or after output last char
+    int tx_missed;
+
+    // terminal port I/O base #
+    int io_base;
+
+    // flow-control mux
+    int out_mux;
+
+    // characters to send to terminal buffered here
+    q_t out_q;
+} term_t;
+
 #endif

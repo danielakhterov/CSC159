@@ -26,4 +26,7 @@ extern q_t mux_q;
 // for video access control
 extern int vid_mux;         
 
+// Phase4 data
+extern term_t term[TERM_SIZE];
+
 #endif

@@ -144,3 +144,43 @@ void MuxOpSR(int id, int opcode) {
             cons_printf("Invalid opcode received by MuxOpSR");
     }
 }
+
+void TermSR(int term_no) {
+    // read the type of event from IIR of the terminal port
+
+    // if it's TXRDY, call TermTxSR(term_no)
+    // else if it's RXRDY, call TermRxSR(term_no) which does nothing but 'return;'
+
+    if(term[term_no].io_base == TXRDY) {
+        TermTxSR(term_no);
+    } else if (term[term_no].io_base == RXRDY) {
+        TermRxSR(term_no);
+    }
+
+    // if the tx_missed flag is TRUE, also call TermTxSR(term_no)
+    if(term[term_no].tx_missed == TRUE)
+        TermTxSR(term_no);
+}
+
+
+void TermTxSR(int term_no) {
+    // if the out_q in terminal interface data structure is empty:
+    //  1. set the tx_missed flag to TRUE
+    //  2. return
+    // (otherwise)
+    //  1. get 1st char from out_q
+    //  2. use outportb() to send it to the DATA register of the terminal port
+    //  3. set the tx_missed flag to TRUE
+    //  4. unlock the out_mux of the terminal interface data structure
+
+    if(QisEmpty(&term[term_no].out_q)) {
+        term[term_no].tx_missed = TRUE;
+        return;
+    } else {
+        int ch = DeQ(&term[term_no].out_q);
+        // outportb(ch);
+        term[term_no].tx_missed = TRUE;
+        MuxOpSR(term[term_no].out_mux, UNLOCK);
+    }
+}
+void TermRxSR(int term_no) {}

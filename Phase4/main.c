@@ -29,6 +29,11 @@ int sys_centi_sec = 0;
 mux_t mux[MUX_SIZE]; 
 int vid_mux = 0;
 
+term_t term[TERM_SIZE] = {
+  { TRUE, TERM0_IO_BASE },
+  { TRUE, TERM1_IO_BASE }
+}; 
+
 // Initialize Kernal Data
 void InitKernelData(void) {
     int i;
@@ -88,6 +93,16 @@ void InitKernelControl(void) {
 
     fill_gate(&intr_table[MUX_OP_CALL], 
             (int)MuxOpEntry, get_cs(), 
+            ACC_INTR_GATE, 
+            0);
+
+    fill_gate(&intr_table[TERM0_INTR], 
+            (int)TERM0Entry, get_cs(), 
+            ACC_INTR_GATE, 
+            0);
+
+    fill_gate(&intr_table[TERM1_INTR], 
+            (int)TERM1Entry, get_cs(), 
             ACC_INTR_GATE, 
             0);
 
@@ -170,6 +185,12 @@ void Kernel(trapframe_t * trapframe_p) {
             break;
         case MUX_OP_CALL:
             MuxOpSR(trapframe_p->eax, trapframe_p->ebx);
+            break;
+        case TERM0_INTR:
+            TermSR(0);
+            break;
+        case TERM1_INTR:
+            TermSR(1);
             break;
         default:
             cons_printf("Panic!: Should never be here\n");
