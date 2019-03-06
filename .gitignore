@@ -3,3 +3,4 @@
 *.o
 *.dli
 .accessed
+*.RC

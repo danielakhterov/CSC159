@@ -1,0 +1,116 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+AR	Makefile	/^AR = i386-unknown-gnu-ar$/;"	m
+AS	Makefile	/^AS = i386-unknown-gnu-as$/;"	m
+ASFLAGS	Makefile	/^ASFLAGS = $(TARGET_MACH)$/;"	m
+Bzero	k-lib.c	/^void Bzero(char * p, int bytes) {$/;"	f
+CC	Makefile	/^CC = i386-unknown-gnu-gcc$/;"	m
+CFLAGS	Makefile	/^CFLAGS = -Wall $(OPTIMIZE) -g$/;"	m
+CF_DEBUG	Makefile	/^CF_DEBUG = -g$/;"	m
+CLEAN_FILES	Makefile	/^CLEAN_FILES = core *.o *.asm mapfile $(MY_DLI) *~ make.orig *.E tags \\$/;"	m
+CMD_COPY	Makefile	/^CMD_COPY = cp -p$/;"	m
+CMD_DELETE	Makefile	/^CMD_DELETE = rm -f$/;"	m
+CMD_DOWNLOADER	Makefile	/^CMD_DOWNLOADER = flash -d$/;"	m
+CMD_LINKER	Makefile	/^CMD_LINKER = link386$/;"	m
+CMD_MAKEMAKE	Makefile	/^CMD_MAKEMAKE = spede-mkmf$/;"	m
+CMD_TAGS	Makefile	/^CMD_TAGS = ctags$/;"	m
+DeQ	k-lib.c	/^int DeQ(q_t * p) {$/;"	f
+EXTRA_CFLAGS	Makefile	/^EXTRA_CFLAGS = $/;"	m
+EXTRA_LINK_FLAGS	Makefile	/^EXTRA_LINK_FLAGS =$/;"	m
+EnQ	k-lib.c	/^void EnQ(int to_add, q_t * p) {$/;"	f
+GETPID_CALL	k-const.h	34;"	d
+GetPidCall	sys-call.c	/^int GetPidCall(void) {$/;"	f
+GetPidSR	k-sr.c	/^int GetPidSR(void) {$/;"	f
+Heapify	k-lib.c	/^void Heapify(q_t * p, int i) { $/;"	f
+InitKernelControl	main.c	/^void InitKernelControl(void) {$/;"	f
+InitKernelData	main.c	/^void InitKernelData(void) {$/;"	f
+InitProc	proc.c	/^void InitProc(void) {$/;"	f
+K_STACK_SIZE	k-entry.S	/^#define K_STACK_SIZE (PROC_STACK_SIZE * 8)$/;"	d
+Kernel	main.c	/^void Kernel(trapframe_t * trapframe_p) {$/;"	f
+LINK_FLAGS	Makefile	/^LINK_FLAGS = $(CF_DEBUG) $(EXTRA_LINK_FLAGS)$/;"	m
+LOOP	k-const.h	18;"	d
+MASK	k-const.h	11;"	d
+MKF_VERSION	Makefile	/^MKF_VERSION=$Release$\/March2001\/bwitt$/;"	m
+MODEL	Makefile	/^MODEL = $(TARGET_MACH)$/;"	m
+MY_DLI	Makefile	/^MY_DLI = $(OS_NAME).dli$/;"	m
+NM	Makefile	/^NM = i386-unknown-gnu-nm$/;"	m
+NONE	k-const.h	5;"	d
+NewProcSR	k-sr.c	/^void NewProcSR(func_p_t p) {$/;"	f
+OBJECTS	Makefile	/^OBJECTS =  k-entry.o k-lib.o k-sr.o main.o proc.o sys-call.o$/;"	m
+OPTIMIZE	Makefile	/^OPTIMIZE =$/;"	m
+OS_NAME	Makefile	/^OS_NAME = MyOS$/;"	m
+PIC_CONTROL	k-const.h	13;"	d
+PIC_MASK	k-const.h	9;"	d
+PROC_SIZE	k-const.h	22;"	d
+PROC_STACK_SIZE	k-const.h	24;"	d
+PreKernel	k-entry.S	/^PreKernel: $/;"	l
+PriorityDequeue	k-lib.c	/^int PriorityDequeue(q_t * p) {$/;"	f
+PriorityEnqueue	k-lib.c	/^void PriorityEnqueue(q_t * p, int pid) {$/;"	f
+Q_SIZE	k-const.h	26;"	d
+QisEmpty	k-lib.c	/^int QisEmpty(q_t * p) { return p->length == 0; }$/;"	f
+QisFull	k-lib.c	/^int QisFull(q_t * p) { return p->length == Q_SIZE; }$/;"	f
+READY	k-type.h	/^typedef enum {UNUSED, READY, RUN, SLEEP} state_t;$/;"	e	enum:__anon1
+RUN	k-type.h	/^typedef enum {UNUSED, READY, RUN, SLEEP} state_t;$/;"	e	enum:__anon1
+SHOWCHAR_CALL	k-const.h	35;"	d
+SLEEP	k-type.h	/^typedef enum {UNUSED, READY, RUN, SLEEP} state_t;$/;"	e	enum:__anon1
+SLEEP_CALL	k-const.h	36;"	d
+SRC	Makefile	/^SRC = k-entry.S k-lib.c k-sr.c main.c proc.c sys-call.c $/;"	m
+Scheduler	main.c	/^void Scheduler(void) {$/;"	f
+ShowCharCall	sys-call.c	/^void ShowCharCall(int row, int col, int ch) {$/;"	f
+ShowCharSR	k-sr.c	/^void ShowCharSR(int row, int col, int ch) {$/;"	f
+SleepCall	sys-call.c	/^void SleepCall(int centi_sec) {  $/;"	f
+SleepSR	k-sr.c	/^void SleepSR(int sec) {$/;"	f
+TARGET_MACH	Makefile	/^TARGET_MACH = -i386-unknown-gnu$/;"	m
+TIMER_DONE	k-const.h	15;"	d
+TIMER_INTR	k-const.h	7;"	d
+TIME_SLICE	k-const.h	20;"	d
+TimerSR	k-sr.c	/^void TimerSR(void) {$/;"	f
+UNUSED	k-type.h	/^typedef enum {UNUSED, READY, RUN, SLEEP} state_t;$/;"	e	enum:__anon1
+UserProc	proc.c	/^void UserProc(void) {$/;"	f
+VID_HOME	k-const.h	31;"	d
+VID_MASK	k-const.h	29;"	d
+__K_CONST__	k-const.h	2;"	d
+__K_DATA__	k-data.h	2;"	d
+__K_ENTRY__	k-entry.h	2;"	d
+__K_INCLUDE__	k-include.h	2;"	d
+__K_LIB__	k-lib.h	2;"	d
+__K_SR__	k-sr.h	2;"	d
+__K_TYPE__	k-type.h	2;"	d
+__PROC__	proc.h	2;"	d
+__SYS_CALL__	sys-call.h	2;"	d
+cs	k-type.h	/^    unsigned int cs;$/;"	m	struct:__anon2
+efl	k-type.h	/^    unsigned int efl;$/;"	m	struct:__anon2
+eip	k-type.h	/^    unsigned int eip;$/;"	m	struct:__anon2
+entry_id	k-type.h	/^    unsigned int entry_id;$/;"	m	struct:__anon2
+func_p_t	k-type.h	/^typedef void (*func_p_t)(void);$/;"	t
+head	k-type.h	/^    int head;$/;"	m	struct:__anon4
+intr_table	main.c	/^struct i386_gate * intr_table;$/;"	v	typeref:struct:i386_gate
+left	k-lib.c	/^int left(int i) { return (2*i + 1); } $/;"	f
+length	k-type.h	/^    int length;$/;"	m	struct:__anon4
+main	main.c	/^int main(void) {$/;"	f
+parent	k-lib.c	/^int parent(int i) { return (i-1)\/2; }$/;"	f
+pcb	main.c	/^pcb_t pcb[PROC_SIZE];$/;"	v
+pcb_t	k-type.h	/^} pcb_t;$/;"	t	typeref:struct:__anon3
+pid_q	main.c	/^q_t pid_q, ready_q, sleep_q;$/;"	v
+proc_stack	main.c	/^char proc_stack[PROC_SIZE][PROC_STACK_SIZE];$/;"	v
+q	k-type.h	/^    int q[Q_SIZE];$/;"	m	struct:__anon4
+q_t	k-type.h	/^} q_t;$/;"	t	typeref:struct:__anon4
+ready_q	main.c	/^q_t pid_q, ready_q, sleep_q;$/;"	v
+reg	k-type.h	/^    unsigned int reg[8];$/;"	m	struct:__anon2
+right	k-lib.c	/^int right(int i) { return (2*i + 2); } $/;"	f
+run_count	k-type.h	/^    int run_count;$/;"	m	struct:__anon3
+run_pid	main.c	/^int run_pid;$/;"	v
+sleep_q	main.c	/^q_t pid_q, ready_q, sleep_q;$/;"	v
+state	k-type.h	/^    state_t state;$/;"	m	struct:__anon3
+state_t	k-type.h	/^typedef enum {UNUSED, READY, RUN, SLEEP} state_t;$/;"	t	typeref:enum:__anon1
+swap	k-lib.c	/^void swap(int * x, int * y){ $/;"	f
+sys_centi_sec	main.c	/^int sys_centi_sec = 0;$/;"	v
+tail	k-type.h	/^    int tail;$/;"	m	struct:__anon4
+total_count	k-type.h	/^    int total_count;$/;"	m	struct:__anon3
+trapframe_p	k-type.h	/^    trapframe_t * trapframe_p;$/;"	m	struct:__anon3
+trapframe_t	k-type.h	/^} trapframe_t;$/;"	t	typeref:struct:__anon2
+wake_centi_sec	k-type.h	/^    int wake_centi_sec;$/;"	m	struct:__anon3

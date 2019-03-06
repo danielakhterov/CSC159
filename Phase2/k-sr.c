@@ -69,10 +69,10 @@ void TimerSR(void) {
 
     // move it to ready_q
     // change its state
+    // running proc = NONE
     if(pcb[run_pid].run_count >= TIME_SLICE && run_pid != 0) {
         pcb[run_pid].state = READY;
         EnQ(run_pid, &ready_q);
-        // running proc = NONE
         run_pid = NONE;
     }
 }

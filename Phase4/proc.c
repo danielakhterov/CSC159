@@ -74,37 +74,43 @@ void InitProc(void) {
 // in the while(1) loop.
 void UserProc(void) {
     // Get my pid from sys call
-    int i, length, which_term;
+    // int i, length, 
+    int which_term;
     int pid = GetPidCall();
-    char zeros[11] = "0000000000";
-    char * pid_str = &zeros[0];
-    char spaces[11] = "          ";
+    // char zeros[11] = "0000000000";
+    // char * pid_str = &zeros[0];
+    // char spaces[11] = "          ";
 
-    length = 0;
+   char pid_str[STR_SIZE] = "PID    process is running exclusively using the video display...";
+   char spaces[STR_SIZE] = "                                                                ";
+
+   pid_str[4] = '0' + pid / 10;  // show my PID
+   pid_str[5] = '0' + pid % 10;
+
+    // length = 0;
 
     which_term = pid % 2 == 1 ? TERM0_INTR : TERM1_INTR;
 
     // number would be backwards in the array
-    while(pid / 10 > 0) {
-        zeros[10 - length] = (char)((pid % 10) + '0');
-        pid /= 10;
-        length++;
-    } 
+    // while(pid / 10 > 0) {
+    //     zeros[10 - length] = (char)((pid % 10) + '0');
+    //     pid /= 10;
+    //     length++;
+    // } 
 
     // Get the last digit in case the number < 10
-    zeros[10 - length] = (char)((pid % 10) + '0');
-    length++;
+    // zeros[10 - length] = (char)((pid % 10) + '0');
+    // length++;
 
     // Trim the beginning of the number by simply incrementing the pointer
-    for(i = 0; i < 10 - length; i++) {
-        pid_str++;
-    }
-
+    // for(i = 0; i < 10 - length; i++) {
+    //     pid_str++;
+    // } 
 
     while(1) {
         // MuxOpCall(vid_mux, LOCK);
 
-        WriteCall(STDOUT, zeros);
+        WriteCall(STDOUT, pid_str);
         WriteCall(which_term, pid_str);
         WriteCall(which_term, "\n\r");
         SleepCall(50);

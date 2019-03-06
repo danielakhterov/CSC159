@@ -96,7 +96,7 @@ void WriteCall(int device, char * str) {
     col = 0;
 
     if(device == STDOUT) {
-        while(str) {
+        while(*str != '\0') {
             ShowCharCall(row, col++, *str);
             str++;
         }

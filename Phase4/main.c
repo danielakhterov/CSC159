@@ -24,7 +24,7 @@ char proc_stack[PROC_SIZE][PROC_STACK_SIZE];
 // intr table's DRAM location
 struct i386_gate * intr_table;
 // system time in centi-sec, intialize to 0
-int sys_centi_sec = 0;
+int sys_centi_sec;
 
 mux_t mux[MUX_SIZE]; 
 int vid_mux = 0;
@@ -37,6 +37,8 @@ term_t term[TERM_SIZE] = {
 // Initialize Kernal Data
 void InitKernelData(void) {
     int i;
+
+    sys_centi_sec = 0;
 
     // Get Intrupt Table
     intr_table = get_idt_base();
@@ -188,9 +190,11 @@ void Kernel(trapframe_t * trapframe_p) {
             break;
         case TERM0_INTR:
             TermSR(0);
+            outportb(PIC_CONTROL, TERM0_DONE_VAL);
             break;
         case TERM1_INTR:
             TermSR(1);
+            outportb(PIC_CONTROL, TERM1_DONE_VAL);
             break;
         default:
             cons_printf("Panic!: Should never be here\n");

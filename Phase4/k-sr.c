@@ -15,6 +15,7 @@ void NewProcSR(func_p_t p) {
         cons_printf("Panic: no more processes!\n");
         // Cannot continue, alternative: breakpoint();
         breakpoint();
+        return;
     }
 
     // alloc PID (1st is 0)
@@ -46,7 +47,7 @@ void NewProcSR(func_p_t p) {
 
 // Count run_count and switch if hitting time slice
 void TimerSR(void) {
-    int pid;
+    int pid, i;
     // notify PIC timer done
     outportb(PIC_CONTROL, TIMER_DONE);
 
@@ -60,11 +61,14 @@ void TimerSR(void) {
     // Check wake times of processes
 
     // if runs long enough
-
-    while(pcb[sleep_q.q[0]].wake_centi_sec <= sys_centi_sec && sleep_q.tail > 0) {
-        pid = PriorityDequeue(&sleep_q);
-        pcb[pid].state = READY;
-        EnQ(pid, &ready_q);
+    for(i = 0; i < sleep_q.tail; i++) {
+        pid = DeQ(&sleep_q);
+        if(pcb[pid].wake_centi_sec <= sys_centi_sec) {
+            pcb[pid].state = READY;
+            EnQ(pid, &ready_q);
+        } else {
+            EnQ(pid, &sleep_q);
+        }
     }
 
     // move it to ready_q
@@ -95,7 +99,7 @@ void ShowCharSR(int row, int col, int ch) {
 void SleepSR(int sec) {
     pcb[run_pid].wake_centi_sec = sys_centi_sec + sec;
     pcb[run_pid].state = SLEEP;
-    PriorityEnqueue(&sleep_q, run_pid);
+    EnQ(run_pid, &sleep_q);
     run_pid = NONE;
 }
 
@@ -147,13 +151,15 @@ void MuxOpSR(int id, int opcode) {
 
 void TermSR(int term_no) {
     // read the type of event from IIR of the terminal port
+    int term_readiness;
+    term_readiness = inportb(term[term_no].io_base + IIR);
 
     // if it's TXRDY, call TermTxSR(term_no)
     // else if it's RXRDY, call TermRxSR(term_no) which does nothing but 'return;'
 
-    if(term[term_no].io_base == TXRDY) {
+    if(term_readiness == TXRDY) {
         TermTxSR(term_no);
-    } else if (term[term_no].io_base == RXRDY) {
+    } else if(term_readiness == RXRDY) {
         TermRxSR(term_no);
     }
 
@@ -170,7 +176,7 @@ void TermTxSR(int term_no) {
     // (otherwise)
     //  1. get 1st char from out_q
     //  2. use outportb() to send it to the DATA register of the terminal port
-    //  3. set the tx_missed flag to TRUE
+    //  3. set the tx_missed flag to FALSE
     //  4. unlock the out_mux of the terminal interface data structure
 
     if(QisEmpty(&term[term_no].out_q)) {
@@ -178,9 +184,10 @@ void TermTxSR(int term_no) {
         return;
     } else {
         int ch = DeQ(&term[term_no].out_q);
-        // outportb(ch);
-        term[term_no].tx_missed = TRUE;
+        outportb(term[term_no].io_base + DATA, ch);
+        term[term_no].tx_missed = FALSE;
         MuxOpSR(term[term_no].out_mux, UNLOCK);
     }
 }
+
 void TermRxSR(int term_no) {}
