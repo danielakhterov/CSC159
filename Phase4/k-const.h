@@ -64,6 +64,6 @@
 // new mask 1111_1111_1111_1111_1111_1111_1110_0110
 #define MASK 0xffffffe6
 #define TRUE 1
-#define FALSE 1
+#define FALSE 0
 
 #endif
