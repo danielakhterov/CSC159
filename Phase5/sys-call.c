@@ -167,5 +167,10 @@ void ReadCall(int device, char * str) {
 
         chars++;
         str++;
+
+        if(chars == STR_SIZE) {
+            *str = '\0';
+            return;
+        }
     }
 }

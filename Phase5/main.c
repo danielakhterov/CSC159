@@ -34,7 +34,7 @@ term_t term[TERM_SIZE] = {
   { TRUE, TERM1_IO_BASE }
 }; 
 
-// Initialize Kernal Data
+// Initialize Kernel Data
 void InitKernelData(void) {
     int i;
 
