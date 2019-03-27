@@ -158,9 +158,11 @@ void ReadCall(int device, char * str) {
         term_no = 1;
 
     while(1) {
+        int ch;
+
         MuxOpCall(term[term_no].in_mux, LOCK);
-        int ch = DeQ(&term[term_no].out_q);
-        str = &ch;
+        ch = DeQ(&term[term_no].in_q);
+        *str = (char)ch;
 
         if(ch == '\0')
             return;
@@ -168,9 +170,14 @@ void ReadCall(int device, char * str) {
         chars++;
         str++;
 
-        if(chars == STR_SIZE) {
+        if(chars == STR_SIZE - 1) {
             *str = '\0';
             return;
         }
+
+        if(device == TERM0_INTR)
+            asm("int $35");
+        else if(device == TERM1_INTR)
+            asm("int $36");
     }
 }

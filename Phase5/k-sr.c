@@ -47,7 +47,7 @@ void NewProcSR(func_p_t p) {
 
 // Count run_count and switch if hitting time slice
 void TimerSR(void) {
-    int pid, i;
+    int pid, i, length;
     // notify PIC timer done
     outportb(PIC_CONTROL, TIMER_DONE);
 
@@ -61,7 +61,9 @@ void TimerSR(void) {
     // Check wake times of processes
 
     // if runs long enough
-    for(i = 0; i < sleep_q.tail; i++) {
+    length = sleep_q.tail;
+
+    for(i = 0; i < length; i++) {
         pid = DeQ(&sleep_q);
         if(pcb[pid].wake_centi_sec <= sys_centi_sec) {
             pcb[pid].state = READY;
@@ -179,11 +181,18 @@ void TermTxSR(int term_no) {
     //  3. set the tx_missed flag to FALSE
     //  4. unlock the out_mux of the terminal interface data structure
 
-    if(QisEmpty(&term[term_no].out_q)) {
+    if(QisEmpty(&term[term_no].echo_q) && QisEmpty(&term[term_no].out_q)) {
         term[term_no].tx_missed = TRUE;
         return;
     } else {
-        int ch = DeQ(&term[term_no].out_q);
+        int ch;
+        
+        if(!QisEmpty(&term[term_no].echo_q)) {
+            ch = DeQ(&term[term_no].echo_q);
+        } else {
+            ch = DeQ(&term[term_no].out_q);
+        }
+
         outportb(term[term_no].io_base + DATA, (char)ch);
         term[term_no].tx_missed = FALSE;
         MuxOpSR(term[term_no].out_mux, UNLOCK);

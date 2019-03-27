@@ -73,7 +73,7 @@ void InitProc(void) {
 // in the while(1) loop.
 void UserProc(void) {
     // Get my pid from sys call
-    int which_term;
+    int device;
     int pid = GetPidCall();
 
     // char pid_str[STR_SIZE] = "PID    process is running exclusively using the video display...";
@@ -85,7 +85,7 @@ void UserProc(void) {
     pid_str[4] = '0' + pid / 10;
     pid_str[5] = '0' + pid % 10;
 
-    which_term = pid % 2 == 1 ? TERM0_INTR : TERM1_INTR;
+    device = pid % 2 == 1 ? TERM0_INTR : TERM1_INTR;
 
     while(1) {
         // prompt for terminal input
