@@ -174,10 +174,5 @@ void ReadCall(int device, char * str) {
             *str = '\0';
             return;
         }
-
-        if(device == TERM0_INTR)
-            asm("int $35");
-        else if(device == TERM1_INTR)
-            asm("int $36");
     }
 }
