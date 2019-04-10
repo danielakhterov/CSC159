@@ -264,8 +264,8 @@ int ForkSR(void) {
     // n. return child PID
 
     // Our assumption
-    difference = 4096;
-    pcb[pid].trapframe_p = pcb[run_pid].trapframe_p + difference;
+    difference = PROC_STACK_SIZE*(pid-run_pid);
+    pcb[pid].trapframe_p = (trapframe_t *)((int)pcb[run_pid].trapframe_p + difference);
 
     MemCpy((char *)&proc_stack[pid], (char *)&proc_stack[run_pid], PROC_STACK_SIZE);
 
@@ -275,11 +275,11 @@ int ForkSR(void) {
     pcb[pid].trapframe_p->esi = pcb[run_pid].trapframe_p->esi + difference;
     pcb[pid].trapframe_p->edi = pcb[run_pid].trapframe_p->edi + difference;
 
-    p = &pcb[pid].trapframe_p->ebp;
+    p = (int *)pcb[pid].trapframe_p->ebp;
 
     // ???
     while(*p != 0) {
-        *p += difference;
+       *p = *p+difference;
         p = (int *)*p;
     }
 
