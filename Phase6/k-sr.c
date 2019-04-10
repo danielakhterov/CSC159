@@ -13,6 +13,7 @@ void NewProcSR(func_p_t p) {
 
     if(QisEmpty(&pid_q)) {
         cons_printf("Panic: no more processes!\n");
+        breakpoint();
         return;
     }
 
@@ -234,6 +235,7 @@ int ForkSR(void) {
 
     if(QisEmpty(&pid_q)) {
         cons_printf("Panic: no more processes!\n");
+        breakpoint();
         return NONE;
     }
     

@@ -122,9 +122,11 @@ void WriteCall(int device, char * str) {
         // }
 
         while(*str != '\0') {
+            if(QisFull(&term[term_no].out_q))
+                continue;
             MuxOpCall(term[term_no].out_mux, LOCK);
             EnQ((int)*str, &term[term_no].out_q);
-
+            
             if(device == TERM0_INTR)
                 asm("int $35");
             else if(device == TERM1_INTR)

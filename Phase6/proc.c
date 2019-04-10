@@ -76,14 +76,14 @@ void Aout(int device) {
     int pid = GetPidCall();
 
     // char str[] = "xx ( ) Hello, World!\n\r";
-    char str[STR_SIZE] = "   ( ) Hello, World!\n\r";
+    char str[STR_SIZE] = "   ( ) Hello, World!\n\r\0";
 
     str[0] = '0' + pid / 10;
     str[1] = '0' + pid % 10;
 
     // in above str, replace xx with my PID, and a alphabet inside
     // the bracket (alphabet B if my PID is 2, C if 3, D if 4, etc.)
-    str[4] = 'A' + pid;
+    str[4] = 'A' + pid - 1;
 
     // prompt to terminal the str    // use same device as parent
     WriteCall(device, str);
@@ -112,7 +112,7 @@ void UserProc(void) {
 
     char pid_str[STR_SIZE] = "PID    > ";
     char read_buffer[STR_SIZE];
-    char buffer[5];
+    char buffer[6] = "\0\0\0\0\0\0";
 
     pid_str[4] = '0' + pid / 10;
     pid_str[5] = '0' + pid % 10;
@@ -139,7 +139,7 @@ void UserProc(void) {
         // }
 
         if(ret == NONE) {
-            WriteCall(STDOUT, "Couldn't fork!\0");
+            WriteCall(device, "Couldn't fork!\n\r\0");
             continue;
         }
 
@@ -157,14 +157,17 @@ void UserProc(void) {
         if(ret == 0) {
             Aout(device);
         } else {
+            WriteCall(device, "Child PID: ");
+
             Itoa(buffer, ret);
-            WriteCall(STDOUT, buffer);
-            WriteCall(STDOUT, "\n\r");
+            WriteCall(device, buffer);
+            WriteCall(device, "\n\r");
 
             ret = WaitCall();
             Itoa(buffer, ret);
-            WriteCall(STDOUT, buffer);
-            WriteCall(STDOUT, "\n\r");
+            WriteCall(device, "Child exit code: ");
+            WriteCall(device, buffer);
+            WriteCall(device, "\n\r");
         }
     }
 }

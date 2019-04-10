@@ -40,7 +40,7 @@ int DeQ(q_t * p) {
 // if not full, enqueue # to tail slot in queue
 void EnQ(int to_add, q_t * p) {
     if(QisFull(p)) {
-        cons_printf("Panic: queue is full, cannot EnQ!\n");
+        // cons_printf("Panic: queue is full, cannot EnQ!\n");
         return;
     }
 
@@ -76,26 +76,14 @@ int StrCmp(char * left, char * right) {
 }
 
 // We assume buffer size is at least 5
-void Itoa(char * str, unsigned x) {
-    int i;
-    char temp;
-    i = 0;
-
-    if(x >= 100000)
+void Itoa(char * str, int x) {
+    if(x >= 100000 || x < 0) {
         return;
+    }
 
-    for(i = 0; i < 5; i++) {
-        str[i] = x % 10 + '0';
-        x /= 10;
-        i++;
-    };
-
-    // Reverse string
-    temp = str[4];
-    str[4] = str[0];
-    str[0] = temp;
-
-    temp = str[3];
-    str[3] = str[1];
-    str[1] = temp;
+    str[0] = '0' + x / 10000 % 10;
+    str[1] = '0' + x / 1000 % 10;
+    str[2] = '0' + x / 100 % 10;
+    str[3] = '0' + x / 10 % 10;
+    str[4] = '0' + x % 10;
 }

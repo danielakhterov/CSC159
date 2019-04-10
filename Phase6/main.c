@@ -170,6 +170,7 @@ int main(void) {
 
 void Kernel(trapframe_t * trapframe_p) {
     char ch;
+    int ret;
 
     // save it
     pcb[run_pid].trapframe_p = trapframe_p; 
@@ -207,13 +208,17 @@ void Kernel(trapframe_t * trapframe_p) {
             trapframe_p->eax = ForkSR();
             break;
         case WAIT_CALL:
-            trapframe_p->eax = WaitSR();
+            ret = WaitSR();
+            if (ret != NONE) {
+                trapframe_p->eax = ret;
+            }
             break;
         case EXIT_CALL:
             ExitSR(trapframe_p->eax);
             break;
         default:
             cons_printf("Panic!: Should never be here\n");
+            breakpoint();
     }
 
     // check if keyboard pressed
