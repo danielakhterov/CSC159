@@ -3,7 +3,7 @@
 
 #include "k-const.h"
 #include "k-data.h"
-#include "k-lib.h"
+#include "tools.h"
 
 #include <spede/stddef.h>
 
@@ -212,5 +212,29 @@ void ExitCall(int exit_code) {
          : "g" (exit_code),
            "g" (EXIT_CALL)
          : "eax"
+    );
+}
+
+void ExecCall(int code, int arg) {
+    asm("mov %0, %%eax;
+         mov %1, %%ebx;
+         int %2"
+         :
+         : "g" (code),
+           "g" (arg),
+           "g" (EXEC_CALL)
+         : "eax", "ebx"
+    );
+}
+
+void SignalCall(int sig_num, int handler) {
+    asm("mov %0, %%eax;
+         mov %1, %%ebx;
+         int %2"
+         :
+         : "g" (sig_num),
+           "g" (handler),
+           "g" (SIGNAL_CALL)
+         : "eax", "ebx"
     );
 }
