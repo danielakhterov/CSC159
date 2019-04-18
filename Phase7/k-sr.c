@@ -375,10 +375,6 @@ void ExecSR(int code, int arg) {
     //    by NONE. Once found, set their user to run_pid.
     // 2. To calcuate page address = i * PAGE_SIZE + where DRAM begins,
     //    where i is the index of the array page_user[].
-    // 3. Copy PAGE_SIZE bytes from 'code' to the allocated code page,
-    //    with your own MemCpy().
-    // 4. Bzero the allocated stack page.
-    // 5. From the top of the stack page, copy 'arg' there.
     int i, code_page, stack_page;
     trapframe_t temp;
 
@@ -405,6 +401,11 @@ void ExecSR(int code, int arg) {
     page_user[code_page] = run_pid;
     page_user[stack_page] = run_pid;
 
+    // 3. Copy PAGE_SIZE bytes from 'code' to the allocated code page,
+    //    with your own MemCpy().
+    // 4. Bzero the allocated stack page.
+    // 5. From the top of the stack page, copy 'arg' there.
+
     MemCpy((char *)(code_page * PAGE_SIZE + RAM), (char *)&code, PAGE_SIZE);
     Bzero((char *)(stack_page * PAGE_SIZE + RAM), PAGE_SIZE);
 
@@ -424,7 +425,13 @@ void ExecSR(int code, int arg) {
     ((int *)pcb[run_pid].trapframe_p)[1] = 0;
 
     MemCpy((char *)((int *)pcb[run_pid].trapframe_p)[2], (char *)&temp, sizeof(trapframe_t));
+
+    ((int *)pcb[run_pid].trapframe_p)--;
+    ((int *)pcb[run_pid].trapframe_p)--;
+
     pcb[run_pid].trapframe_p--;
+
+    MemCpy((char *)pcb[run_pid].trapframe_p, (char *)&temp, sizeof(trapframe_t));
 
     pcb[run_pid].trapframe_p->efl = EF_DEFAULT_VALUE|EF_INTR;
     pcb[run_pid].trapframe_p->cs = get_cs();
@@ -447,18 +454,19 @@ void WrapperSR(int pid, int handler, int arg) {
     //  'eip' in the original trapframe (UserProc resumes)
     //  (Below them is the original trapframe.)
     // Change eip in the trapframe to Wrapper to run it 1st.
+    // Change trapframe location info in the PCB of this pid.
     trapframe_t temp;
 
-    MemCpy((char *)&temp, (char *)pcb[run_pid].trapframe_p, sizeof(trapframe_t));
+    MemCpy((char *)&temp, (char *)pcb[pid].trapframe_p, sizeof(trapframe_t));
 
     // Set the two bytes we skip as 0
-    ((int *)pcb[run_pid].trapframe_p)[0] = arg;
-    ((int *)pcb[run_pid].trapframe_p)[1] = handler;
-    ((int *)pcb[run_pid].trapframe_p)[2] = temp->eip;
+    ((int *)pcb[pid].trapframe_p)[0] = arg;
+    ((int *)pcb[pid].trapframe_p)[1] = handler;
+    ((int *)pcb[pid].trapframe_p)[2] = temp.eip;
 
-    MemCpy((char *)((int *)pcb[run_pid].trapframe_p)[3], (char *)&temp, sizeof(trapframe_t));
-    pcb[run_pid].trapframe_p->eip = Wrapper;
+    MemCpy((char *)((int *)pcb[pid].trapframe_p)[3], (char *)&temp, sizeof(trapframe_t));
+    pcb[pid].trapframe_p->eip = (int)WrapperSR;
 
-    // Change trapframe location info in the PCB of this pid.
+    pcb[pid].trapframe_p = (trapframe_t *)&(((int *)(pcb[pid].trapframe_p))[3]);
 }
 
