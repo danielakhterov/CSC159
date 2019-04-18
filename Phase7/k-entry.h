@@ -27,6 +27,11 @@ int ForkEntry(void);
 int WaitEntry(void);
 void ExitEntry(int);
 
+// Phase 7
+
+void ExecEntry(int, int);
+void SignalEntry(int, int);
+
 __END_DECLS
 
 #endif

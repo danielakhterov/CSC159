@@ -181,7 +181,6 @@ void Kernel(trapframe_t * trapframe_p) {
     // save it
     pcb[run_pid].trapframe_p = trapframe_p; 
 
-
     // handle timer intr
     switch (trapframe_p->entry_id) {
         case TIMER_INTR:

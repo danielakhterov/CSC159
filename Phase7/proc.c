@@ -117,7 +117,7 @@ void UserProc(void) {
 
     device = pid % 2 == 1 ? TERM0_INTR : TERM1_INTR;
 
-    SignalCall((int)Ouch, device);
+    SignalCall(SIGINT, (int)Ouch);
 
     while(1) {
         WriteCall(device, pid_str);
