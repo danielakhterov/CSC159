@@ -129,6 +129,16 @@ void InitKernelControl(void) {
             ACC_INTR_GATE, 
             0);
 
+    fill_gate(&intr_table[EXEC_CALL], 
+            (int)ExecEntry, get_cs(), 
+            ACC_INTR_GATE, 
+            0);
+
+    fill_gate(&intr_table[SIGNAL_CALL], 
+            (int)SignalEntry, get_cs(), 
+            ACC_INTR_GATE, 
+            0);
+
     // mask out PIC for timer
     // outportb();
     outportb(PIC_MASK, MASK);

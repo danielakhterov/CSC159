@@ -87,4 +87,5 @@ void Itoa(char * str, int x) {
     str[2] = '0' + x / 100 % 10;
     str[3] = '0' + x / 10 % 10;
     str[4] = '0' + x % 10;
+    str[5] = '\0';
 }
