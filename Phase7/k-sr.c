@@ -420,12 +420,10 @@ void ExecSR(int code, int arg) {
     stack_page_top--;
 
     // 7. Lower the trapframe address in PCB of run_pid by the size of
-    //    two integers.
-    stack_page_top--;
-    stack_page_top--;
+    //    two integers
+    (int *)(pcb[run_pid].trapframe_p) -= 2;
 
     // 8. Decrement the trapframe pointer by 1 (one whole trapframe).
-    pcb[run_pid].trapframe_p = (trapframe_t *)stack_page_top;
     pcb[run_pid].trapframe_p--;
 
     // 9. Use the trapframe pointer to set efl and cs (as in NewProcSR).
@@ -452,6 +450,7 @@ void WrapperSR(int pid, int handler, int arg) {
     //  (Below them is the original trapframe.)
     // Change eip in the trapframe to Wrapper to run it 1st.
     // Change trapframe location info in the PCB of this pid.
+    /*
     (int *)pcb[pid].trapframe_p -= 3;
 
     ((int *)pcb[pid].trapframe_p)[2] = arg;
@@ -460,4 +459,17 @@ void WrapperSR(int pid, int handler, int arg) {
 
     pcb[pid].trapframe_p->eip = (int)Wrapper;
     // pcb[run_pid].trapframe_p = pcb[pid].trapframe_p;
+    */
+    trapframe_t temp;
+    int * p = (int *)&pcb[pid].trapframe_p->efl;
+    memcpy((char *)&temp, (char *)&pcb[pid].trapframe_p, sizeof(trapframe_t));
+    *p = arg;
+    p--;
+    *p = handler;
+    p--;
+    *p = temp.eip;
+    (int *)(pcb[pid].trapframe_p) -= 3;
+    pcb[pid].trapframe_p--;
+    memcpy((char *)&pcb[pid].trapframe_p,(char *)&temp,sizeof(trapframe_t));
+    pcb[pid].trapframe_p->eip = (int)Wrapper;
 }

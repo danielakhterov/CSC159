@@ -86,7 +86,7 @@ void Ouch(int device) {
 void Aout(int device) {
     int i;
     int pid = GetPidCall();
-    char str[STR_SIZE] = "   ( ) Hello, World!\n\r\0";
+    char str[] = "   ( ) Hello, World!\n\r\0";
 
     str[0] = '0' + pid / 10;
     str[1] = '0' + pid % 10;
