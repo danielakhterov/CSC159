@@ -85,6 +85,7 @@ void Ouch(int device) {
 
 void Aout(int device) {
     int i;
+    unsigned sleep_time;
     int pid = GetPidCall();
     char str[] = "   ( ) Hello, World!\n\r\0";
 
@@ -94,9 +95,14 @@ void Aout(int device) {
 
     WriteCall(device, str);
 
+    PauseCall();
+
     for(i = 0; i < 70; i++) {
         ShowCharCall(pid, i, str[4]);
-        SleepCall(10);
+
+        sleep_time = RandCall() % 20 + 5;
+        SleepCall((int)sleep_time);
+
         ShowCharCall(pid, i, ' ');
     }
 
@@ -104,13 +110,15 @@ void Aout(int device) {
 }
 
 void UserProc(void) {
+    int i;
     int device;
-    int ret;
+    int ret = NONE;
     int pid = GetPidCall();
 
     char pid_str[STR_SIZE] = "PID    > ";
     char read_buffer[STR_SIZE];
     char buffer[6] = "\0\0\0\0\0\0";
+    char letter[2] = "#\0";
 
     pid_str[4] = '0' + pid / 10;
     pid_str[5] = '0' + pid % 10;
@@ -123,11 +131,13 @@ void UserProc(void) {
         WriteCall(device, pid_str);
         ReadCall(device, read_buffer);
 
-        if(StrCmp(read_buffer, "fork\0") == FALSE) {
+        if(StrCmp(read_buffer, "race\0") == FALSE) {
             continue;
         }
 
-        ret = ForkCall();
+        for(i = 0; i < 5 && ret != 0; i++) {
+            ret = ForkCall();
+        }
 
         if(ret == NONE) {
             WriteCall(device, "Couldn't fork!\n\r\0");
@@ -137,17 +147,29 @@ void UserProc(void) {
         if(ret == 0) {
             ExecCall((int)Aout, device);
         } else {
-            WriteCall(device, "Child PID: ");
+            SleepCall(300);
 
-            Itoa(buffer, ret);
-            WriteCall(device, buffer);
-            WriteCall(device, "\n\r");
+            KillCall(pid, SIGGO);
 
-            ret = WaitCall();
-            Itoa(buffer, ret);
-            WriteCall(device, "Child exit code: ");
-            WriteCall(device, buffer);
-            WriteCall(device, "\n\r");
+            // WriteCall(device, "Child PID: ");
+
+            // Itoa(buffer, ret);
+            // WriteCall(device, buffer);
+            // WriteCall(device, "\n\r");
+
+            for(i = 0; i < 5; i++) {
+                ret = WaitCall();
+                Itoa(buffer, ret);
+
+                WriteCall(device, "Child exit code: ");
+                WriteCall(device, buffer);
+                WriteCall(device, " ... ");
+
+                letter[0] = 'A' + (ret / 100) - 1;
+                WriteCall(device, letter);
+                WriteCall(device, " Arrives!");
+                WriteCall(device, "\n\r");
+            }
         }
     }
 }

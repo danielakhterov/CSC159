@@ -29,6 +29,8 @@ int sys_centi_sec;
 mux_t mux[MUX_SIZE]; 
 int vid_mux = 0;
 
+unsigned rand;
+
 term_t term[TERM_SIZE] = {
   { TRUE, TERM0_IO_BASE },
   { TRUE, TERM1_IO_BASE }
@@ -139,6 +141,21 @@ void InitKernelControl(void) {
             ACC_INTR_GATE, 
             0);
 
+    fill_gate(&intr_table[PAUSE_CALL], 
+            (int)PauseEntry, get_cs(), 
+            ACC_INTR_GATE, 
+            0);
+
+    fill_gate(&intr_table[KILL_CALL], 
+            (int)KillEntry, get_cs(), 
+            ACC_INTR_GATE, 
+            0);
+
+    fill_gate(&intr_table[RAND_CALL], 
+            (int)RandEntry, get_cs(), 
+            ACC_INTR_GATE, 
+            0);
+
     // mask out PIC for timer
     // outportb();
     outportb(PIC_MASK, MASK);
@@ -237,6 +254,15 @@ void Kernel(trapframe_t * trapframe_p) {
         case SIGNAL_CALL:
             SignalSR(trapframe_p->eax, trapframe_p->ebx);
             break;
+        case PAUSE_CALL:
+            PauseSR();
+            break;
+        case KILL_CALL:
+            KillSR(trapframe_p->eax, trapframe_p->ebx);
+            break;
+        case RAND_CALL:
+            trapframe_p->eax = RandSR();
+            break;
         default:
             cons_printf("Panic!: Should never be here\n");
             breakpoint();
@@ -253,6 +279,10 @@ void Kernel(trapframe_t * trapframe_p) {
         // 'n' for new process
         else if(ch == 'n') {
             // create a UserProc
+            if (rand == 0) {
+                rand = sys_centi_sec;
+            }
+
             NewProcSR(UserProc);
         }
     }

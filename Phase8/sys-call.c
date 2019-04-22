@@ -230,11 +230,40 @@ void ExecCall(int code, int arg) {
 void SignalCall(int sig_num, int handler) {
     asm("mov %0, %%eax;
          mov %1, %%ebx;
-         int %2"
+         int %2;"
          :
          : "g" (sig_num),
            "g" (handler),
            "g" (SIGNAL_CALL)
          : "eax", "ebx"
     );
+}
+
+void PauseCall(void) {
+    asm("int $58");
+}
+
+void KillCall(int pid, int sig_num) {
+    asm("mov %0, %%eax;
+         mov %1, %%ebx;
+         int %2"
+         :
+         : "g" (pid),
+           "g" (sig_num),
+           "g" (KILL_CALL)
+         : "eax", "ebx"
+    );
+}
+
+unsigned RandCall(void) {
+    int ret;
+
+    asm("int %1;
+         mov %%eax, %0"
+         : "=g" (ret)
+         : "g" (RAND_CALL)
+         : "eax"
+    );
+
+    return ret;
 }

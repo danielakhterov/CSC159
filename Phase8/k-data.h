@@ -29,4 +29,7 @@ extern term_t term[TERM_SIZE];
 // Phase 7
 extern int page_user[PAGE_NUM];
 
+// Phase 8
+extern unsigned rand;
+
 #endif

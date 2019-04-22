@@ -32,6 +32,10 @@ void ExitEntry(int);
 void ExecEntry(int, int);
 void SignalEntry(int, int);
 
+void PauseEntry(void);
+void KillEntry(int, int);
+unsigned RandEntry(void);
+
 __END_DECLS
 
 #endif

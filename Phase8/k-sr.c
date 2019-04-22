@@ -246,11 +246,19 @@ int WaitSR(void) {
 }
 
 void ExitSR(int exit_code) {
+    int i;
 
     if(pcb[pcb[run_pid].ppid].state != WAIT) {
         pcb[run_pid].state = ZOMBIE;
         run_pid = NONE;
         return;
+    }
+
+    // Free memory pages
+    for(i = 0; i < PAGE_NUM; i++) {
+        if(page_user[i] == run_pid) {
+            page_user[i] = NONE;
+        }
     }
 
     pcb[pcb[run_pid].ppid].state = READY;
@@ -323,4 +331,28 @@ void WrapperSR(int pid, int handler, int arg) {
     (int *)temp += 1;
 
     pcb[pid].trapframe_p->eip = (int)Wrapper;
+}
+
+void PauseSR(void) {
+    // a. alter the state of the running process
+    // b. the running process is now NONE
+    pcb[run_pid].state = PAUSE;
+    run_pid = NONE;
+}
+
+void KillSR(int pid, int sig_num) {
+    int i;
+
+    for(i = 0; i < PROC_SIZE; i++) {
+        if(pcb[i].ppid == pid && pcb[i].state == PAUSE) {
+            pcb[i].state = READY;
+            EnQ(i, &ready_q);
+        }
+    }
+}
+
+unsigned RandSR(void) {
+    rand = run_pid * rand + A_PRIME;
+    rand %= G2;
+    return rand;
 }

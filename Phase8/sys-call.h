@@ -8,7 +8,7 @@ void SleepCall(int);
 int MuxCreateCall(int);
 void MuxOpCall(int, int);
 void WriteCall(int, char *);
-void ReadCall(int device, char * str);
+void ReadCall(int, char *);
 
 // Phase 6
 
@@ -20,5 +20,11 @@ void ExitCall(int);
 
 void ExecCall(int, int);
 void SignalCall(int, int);
+
+// Phase 8
+
+void PauseCall(void);
+void KillCall(int, int);
+unsigned RandCall(void);
 
 #endif

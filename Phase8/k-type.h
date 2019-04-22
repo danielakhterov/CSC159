@@ -7,7 +7,7 @@
 typedef void (* func_p_t)(void);
 typedef void (* func_p_t2)(int);
 
-typedef enum {UNUSED, READY, RUN, SLEEP, SUSPEND, WAIT, ZOMBIE} state_t;
+typedef enum {UNUSED, READY, RUN, SLEEP, SUSPEND, WAIT, ZOMBIE, PAUSE} state_t;
 
 typedef struct {
     unsigned int edi;

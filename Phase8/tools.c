@@ -33,7 +33,6 @@ int DeQ(q_t * p) {
     }
 
     p->tail--;
-    p->q[p->tail] = 0;
 
     return ret;
 }

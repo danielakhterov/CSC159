@@ -80,4 +80,18 @@
 #define PAGE_SIZE 4096
 #define RAM 0xe00000
 
+// Phase 8
+
+// to pause a process
+#define PAUSE_CALL 58
+// to kill is actually to send a signal
+#define KILL_CALL 59
+// to get a random number
+#define RAND_CALL 60
+// a new signal
+#define SIGGO 4
+#define A_PRIME 6700417
+// 2G-1, % operator can't take a full 2G
+#define G2 2147483647
+
 #endif

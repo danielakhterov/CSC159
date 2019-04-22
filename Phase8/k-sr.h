@@ -26,4 +26,10 @@ void ExecSR(int, int);
 void SignalSR(int, int);
 void WrapperSR(int, int, int);
 
+// Phase 8
+
+void PauseSR(void);
+void KillSR(int, int);
+unsigned RandSR(void);
+
 #endif
