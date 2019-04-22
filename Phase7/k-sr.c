@@ -218,12 +218,6 @@ void TermRxSR(int term_no) {
         device = TERM1_INTR;
     }
 
-    suspended_pid = QPeek(&mux[term[term_no].in_mux].suspend_q);
-
-    if(ch == SIGINT && !QisEmpty(&mux[term[term_no].in_mux].suspend_q) && pcb[suspended_pid].sigint_handler != 0) {
-        WrapperSR(suspended_pid, pcb[suspended_pid].sigint_handler, device);
-    }
-
     EnQ(ch, &term[term_no].echo_q);
 
     if(ch == '\r') {
@@ -231,6 +225,13 @@ void TermRxSR(int term_no) {
         EnQ('\0', &term[term_no].in_q);
     } else {
         EnQ(ch, &term[term_no].in_q);
+    }
+
+    suspended_pid = QPeek(&mux[term[term_no].in_mux].suspend_q);
+
+    if(ch == SIGINT && !QisEmpty(&mux[term[term_no].in_mux].suspend_q) && pcb[suspended_pid].sigint_handler != 0) {
+        breakpoint();
+        WrapperSR(suspended_pid, pcb[suspended_pid].sigint_handler, device);
     }
 
     MuxOpSR(term[term_no].in_mux, UNLOCK);
@@ -252,7 +253,6 @@ int ForkSR(void) {
 
     if(QisEmpty(&pid_q)) {
         cons_printf("Panic: no more processes!\n");
-        breakpoint();
         return NONE;
     }
     
@@ -373,75 +373,63 @@ void ExitSR(int exit_code) {                  // child exits
 
 void ExecSR(int code, int arg) {
     // 1. Allocate two DRAM pages, one for code, one for stack space:
-    //    loop thru page_user[] for two pages that are currently used
-    //    by NONE. Once found, set their user to run_pid.
+    //  loop thru page_user[] for two pages that are currently used
+    //  by NONE. Once found, set their user to run_pid.
     // 2. To calcuate page address = i * PAGE_SIZE + where DRAM begins,
-    //    where i is the index of the array page_user[].
-    int i;
-    int * code_page; 
-    int * stack_page;
-    int * stack_page_top;
+    //  where i is the index of the array page_user[].
+    // 5. In the top 4 bytes of the stack page, copy 'arg' there.
+    // 6. Skip 4 more bytes below 'arg' (this is for return address but not used)
+    // 7. First set the trapframe address at the un-used return addr
+    // 8. Then decrement the trapframe pointer by 1 (one whole trapframe).
+    // 9. Use the trapframe pointer to set efl and cs (as in NewProcSR).
+    // 10. Set the eip of the trapframe to the start of the new code page.
+    int code_page_index = NONE;
+    int stack_page_index = NONE;
+    char * code_page = 0;
+    char * stack_page = 0;
+    char * stack_page_top = 0;
 
-    code_page = 0;
-    stack_page = 0;
+    code_page_index = AllocatePage(0);
+    stack_page_index = AllocatePage(code_page_index + 1);
 
-    for(i = 0; i < PAGE_NUM; i++) {
-        if(page_user[i] != NONE)
-            continue;
-
-        if(code_page == 0) {
-            page_user[i] = run_pid;
-            code_page = (int *)(i * PAGE_SIZE + RAM);
-        } else if(stack_page == 0) {
-            page_user[i] = run_pid;
-            stack_page = (int *)(i * PAGE_SIZE + RAM);
-            break;
-        }
-    }
-
-    if(code_page == 0 || stack_page == 0) {
+    if(code_page_index == NONE || stack_page_index == NONE){ 
         cons_printf("Panic: Ran out of memory pages\n");
         return;
     }
 
-    // 3. Copy PAGE_SIZE bytes from 'code' to the allocated code page, with your own MemCpy().
-    MemCpy((char *)code_page, (char *)code, PAGE_SIZE);
+    page_user[code_page_index] = run_pid;
+    page_user[stack_page_index] = run_pid;
 
+    code_page = (char *)(code_page_index * PAGE_SIZE + RAM);
+    stack_page = (char *)(stack_page_index * PAGE_SIZE + RAM);
+
+    // 3. Copy PAGE_SIZE bytes from 'code' to the allocated code page,
+    //  with your own MemCpy().
+    MemCpy(code_page, (char *)code, PAGE_SIZE);
     // 4. Bzero the allocated stack page.
-    Bzero((char *)stack_page, PAGE_SIZE);
-    
-    // 5. From the top of the stack page, copy 'arg' there.
-    stack_page_top = stack_page + PAGE_SIZE;
+    Bzero(stack_page, PAGE_SIZE);
 
-    stack_page_top--;
-    *stack_page_top = arg;
+    stack_page_top = (char *)(stack_page + PAGE_SIZE);
 
-    // 6. Skip a whole 4 bytes (return address, size of an integer).
-    stack_page_top--;
+    stack_page_top -= sizeof(int);
+    *(int *)stack_page_top = arg;
 
-    // 7. Lower the trapframe address in PCB of run_pid by the size of
-    //    two integers
-    (int *)(pcb[run_pid].trapframe_p) -= 2;
+    stack_page_top -= sizeof(int);
+    stack_page_top -= sizeof(trapframe_t);
 
-    // 8. Decrement the trapframe pointer by 1 (one whole trapframe).
-    pcb[run_pid].trapframe_p--;
+    pcb[run_pid].trapframe_p = (trapframe_t *)stack_page_top;
 
-    // 9. Use the trapframe pointer to set efl and cs (as in NewProcSR).
-    // 10. However, set the eip to the start of the new code page.
     pcb[run_pid].trapframe_p->efl = EF_DEFAULT_VALUE|EF_INTR;
     pcb[run_pid].trapframe_p->cs = get_cs();
     pcb[run_pid].trapframe_p->eip = (int)code_page;
 }
 
 void SignalSR(int sig_num, int handler) {
-    // Just set sigint_handler in PCB of run_pid to handler.
-    // The sig_num will be used in the next phase to differ
-    // for different signals.
-
     pcb[run_pid].sigint_handler = handler;
 }
 
 void WrapperSR(int pid, int handler, int arg) {
+    // move trapframe down by 3 ints in same page
     // Lower the trapframe address by the size of 3 integers.
     // Fill the space of the vacated 3 integers with (from top):
     //  'arg' (2nd arg to Wrapper)
@@ -450,26 +438,22 @@ void WrapperSR(int pid, int handler, int arg) {
     //  (Below them is the original trapframe.)
     // Change eip in the trapframe to Wrapper to run it 1st.
     // Change trapframe location info in the PCB of this pid.
-    /*
-    (int *)pcb[pid].trapframe_p -= 3;
 
-    ((int *)pcb[pid].trapframe_p)[2] = arg;
-    ((int *)pcb[pid].trapframe_p)[1] = handler;
-    ((int *)pcb[pid].trapframe_p)[0] = temp.eip;
+    trapframe_t * temp = pcb[pid].trapframe_p;
+    (char *)temp -= 3 * sizeof(int);
 
-    pcb[pid].trapframe_p->eip = (int)Wrapper;
-    // pcb[run_pid].trapframe_p = pcb[pid].trapframe_p;
-    */
-    trapframe_t temp;
-    int * p = (int *)&pcb[pid].trapframe_p->efl;
-    memcpy((char *)&temp, (char *)&pcb[pid].trapframe_p, sizeof(trapframe_t));
-    *p = arg;
-    p--;
-    *p = handler;
-    p--;
-    *p = temp.eip;
-    (int *)(pcb[pid].trapframe_p) -= 3;
-    pcb[pid].trapframe_p--;
-    memcpy((char *)&pcb[pid].trapframe_p,(char *)&temp,sizeof(trapframe_t));
+    MemCpy((char *)temp, (char *)pcb[pid].trapframe_p, sizeof(trapframe_t));
+    pcb[pid].trapframe_p = temp;
+    temp++;
+
+    *(int *)temp = pcb[pid].trapframe_p->eip;
+    (int *)temp += 1;
+
+    *(int *)temp = handler;
+    (int *)temp += 1;
+
+    *(int *)temp = arg;
+    (int *)temp += 1;
+
     pcb[pid].trapframe_p->eip = (int)Wrapper;
 }

@@ -15,4 +15,6 @@ void MemCpy(char *, char *, int);
 int StrCmp(char *, char *);
 void Itoa(char *, unsigned);
 
+int AllocatePage();
+
 #endif

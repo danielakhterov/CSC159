@@ -89,3 +89,15 @@ void Itoa(char * str, int x) {
     str[4] = '0' + x % 10;
     str[5] = '\0';
 }
+
+int AllocatePage(int start) {
+    int i;
+    for(i = start; i < PAGE_NUM; i++) {
+        if(page_user[i] != NONE)
+            continue;
+
+        return i;
+    }
+    
+    return NONE;
+}
