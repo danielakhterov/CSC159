@@ -222,7 +222,7 @@ int ForkSR(void) {
 }
 
 int WaitSR(void) {
-    int i;
+    int i,j;
     int exit_code;
 
     for(i = 0; i < PROC_SIZE; i++) {
@@ -239,6 +239,11 @@ int WaitSR(void) {
 
     exit_code = pcb[i].trapframe_p->eax;
 
+    for(j = 0;j<PAGE_NUM;j++){
+        if(page_user[j] == i){
+            page_user[j] = NONE;
+	}
+    }
     pcb[i].state = UNUSED;
     EnQ(i, &pid_q);
 
